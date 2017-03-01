@@ -1,44 +1,47 @@
 package com.amitrega01.snake;
 
+import com.amitrega01.snake.Screens.MenuScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class MyGame extends Game {
-	public SpriteBatch batch;
+    public SpriteBatch batch;
+    public static int WIDTH = 450;
+    public static int HEIGHT = 800;
+    static float scl2 = 25;
+    public static int scl = 25;
+    public static int fps = 8;
+    public static int col, row;
 
-	public static  int WIDTH = 450;
-	public static  int HEIGHT = 800;
-	static float scl2 =25;
-	public static int scl = 25;
-	public static int fps = 8;
-	public static int col,row;
+    @Override
+    public void create() {
+        //scalling system
+        scl2 = scl * Gdx.graphics.getWidth() / WIDTH;
+        scl = Math.round(scl2);
+        System.out.println(scl2);
+        System.out.println(scl);
+        WIDTH = (Gdx.graphics.getWidth() / scl) * scl;
+        HEIGHT = (Gdx.graphics.getHeight() / scl) * scl;
+        col = WIDTH / scl;
+        row = HEIGHT / scl;
+        //end of scalling system
+        batch = new SpriteBatch();
+        
+        setScreen(new MenuScreen(this));
+    }
 
-	@Override
-	public void create () {
-		//scalling system
-		scl2 = scl*Gdx.graphics.getWidth() / WIDTH;
-		scl = Math.round(scl2);
-		System.out.println(scl2);
-		System.out.println(scl);
-		WIDTH = (Gdx.graphics.getWidth()/scl) *scl ;
-		HEIGHT = (Gdx.graphics.getHeight()/scl) *scl ;
-		col = WIDTH / scl;
-		row = HEIGHT /scl;
-		//end of scalling system
-
-		batch = new SpriteBatch();
-	}
-
-	@Override
-	public void render () {
-		super.render();
-	}
-	
-	@Override
-	public void dispose () {
-		batch.dispose();
-	}
+    @Override
+    public void render() {
+        super.render();
+    }
+//asd
+    @Override
+    public void dispose() {
+        batch.dispose();
+    }
 }
