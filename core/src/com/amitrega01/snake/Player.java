@@ -15,8 +15,8 @@ public class Player {
     public int playerX;
     public int playerY;
     public int dir;
-    int[] tailX;
-    int[] tailY;
+    public int[] tailX;
+    public int[] tailY;
     public int length;
 
 
@@ -93,6 +93,7 @@ public class Player {
             g+=dr;
         }
     }
+
     public boolean checkCollision() {
         for (int i=0;i<length;i++) {
             if (tailX[i] == playerX && tailY[i] == playerY)  return false;
