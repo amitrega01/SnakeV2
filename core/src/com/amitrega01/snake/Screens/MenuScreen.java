@@ -5,24 +5,61 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import java.awt.Menu;
+
+import static com.amitrega01.snake.MyGame.HEIGHT;
+import static com.amitrega01.snake.MyGame.WIDTH;
+import static com.amitrega01.snake.MyGame.scl;
 
 /**
  * Created by amitr on 01.03.2017.
  */
 
 public class MenuScreen implements Screen {
-    private Stage stage;
-    private Game game;
 
-    public MenuScreen(MyGame agame) {
-        this.game = agame;
+    public MyGame game;
+    private Skin skin;
+    private Stage stage;
+    public MenuScreen(final MyGame game) {
+        this.game = game;
+        skin = new Skin(Gdx.files.internal("quantum-horizon/skin/quantum-horizon-ui.json"));
         stage = new Stage();
+        int btnW = 10* scl;
+        int btnH = 3* scl;
+
+        final TextButton startBtn = new TextButton("Start",skin);
+        startBtn.setWidth(btnW);
+        startBtn.setHeight(btnH);
+        startBtn.setPosition(WIDTH/2 -10* scl/2,HEIGHT/2);
+
+        final Image logo = new Image(new Texture("logo.png"));
+        logo.setWidth(WIDTH-100);
+        logo.setHeight(WIDTH/(logo.getWidth()+200)* logo.getHeight());
+        logo.setPosition(3*scl,HEIGHT - logo.getHeight() -scl);
+
+        startBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y){
+                game.setScreen(new ClassicSnake(game));
+            }
+        });
+        stage.addActor(startBtn);
+        stage.addActor(logo);
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -32,9 +69,12 @@ public class MenuScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1,1,1,1);
+        Gdx.gl.glClearColor(0.169f, 0.176f, 0.259f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) game.setScreen(new ClassicSnake(game));
+        game.batch.begin();
+        stage.draw();
+        game.batch.end();
     }
 
     @Override
@@ -59,6 +99,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
+        skin.dispose();
     }
 }
