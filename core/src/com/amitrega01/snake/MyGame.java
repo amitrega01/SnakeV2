@@ -33,10 +33,12 @@ public class MyGame extends Game {
         font = new BitmapFont();
 
 
+        /*FileHandle fontFile = new FileHandle("lato.ttf");
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(fontFile);
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = scl;
         font = generator.generateFont(parameter);
+        generator.dispose();*/
 
         shape = new ShapeRenderer();
         setScreen(new MenuScreen(this));
