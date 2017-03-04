@@ -73,7 +73,7 @@ public class MenuScreen implements Screen {
         optionBtn.addListener(new ClickListener() {
                                   @Override
                                   public void clicked(InputEvent event, float x, float y) {
-                                      Gdx.app.exit();
+                                      game.setScreen(new OptionsScreen(game));
                                   }
                               }
         );
