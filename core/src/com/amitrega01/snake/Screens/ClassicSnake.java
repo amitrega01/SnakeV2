@@ -26,7 +26,8 @@ public class ClassicSnake implements Screen {
     boolean state;
     float timeSpent;
     int score = 0;
-    int r1,r2;
+    int r1, r2;
+    float speed = 8;
 
     public ClassicSnake(MyGame game) {
         this.game = game;
@@ -71,7 +72,7 @@ public class ClassicSnake implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.169f, 0.176f, 0.259f, 1f); //bgColor
+        Gdx.gl.glClearColor(0.169f, 0.176f, 0.259f, 1); //bgColor
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (state) {
             checkInput();
@@ -87,12 +88,12 @@ public class ClassicSnake implements Screen {
                 //The following loop will try to catch up if you're not at 30 fps.
                 //This code will reset the amount of time it needs to spend catching up if there's too
                 //much to do (maybe because the device can't keep up).
-                timeSpent = 1 / 8F;
+                timeSpent = 1 / speed;
             }
-            while (timeSpent >= 1 / 8F) {
+            while (timeSpent >= 1 / speed) {
 
                 player.move();
-                timeSpent -= 1 / 8f;
+                timeSpent -= 1 / speed;
                 eat();
                 state = player.checkCollision();
             }
@@ -141,7 +142,10 @@ public class ClassicSnake implements Screen {
 
     public void checkInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            if (player.dir != 3) player.setDir(4);
+            if (player.dir != 3) {
+                while (player.playerY % scl!=0) player.move();
+                player.setDir(4);
+            }
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
             if (player.dir != 4) player.setDir(3);
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
@@ -155,7 +159,7 @@ public class ClassicSnake implements Screen {
     void eat() {
         if (fruit.fruitX == player.playerX && fruit.fruitY == player.playerY) {
             random();
-            for (int i = 0; i<player.length; i++) {
+            for (int i = 0; i < player.length; i++) {
                 if (r1 == player.tailX[i] && r2 == player.tailY[i]) random();
             }
             fruit.fruitX = r1;
@@ -171,6 +175,6 @@ public class ClassicSnake implements Screen {
 
     void debug() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.O)) player.addLength();
-
+        if (Gdx.input.isKeyJustPressed(Input.Keys.L)) speed++;
     }
 }
