@@ -10,8 +10,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import static com.amitrega01.snake.MyGame.scl;
+import static com.amitrega01.snake.MyGame.speed;
 import static com.badlogic.gdx.math.MathUtils.random;
 
 /**
@@ -21,20 +26,36 @@ import static com.badlogic.gdx.math.MathUtils.random;
 public class ClassicSnake implements Screen {
 
     private MyGame game;
+    private Stage stage;
+    private Skin skin;
+
     public Player player;
     public Fruit fruit;
-    boolean state;
+    static boolean state;
     float timeSpent;
     int score = 0;
     int r1, r2;
-    float speed = 8;
+    final Label scoreL;
 
     public ClassicSnake(MyGame game) {
         this.game = game;
+
+        skin = new Skin(Gdx.files.internal("quantum-horizon/skin/quantum-horizon-ui.json"));
+        stage = new Stage();
+
+        scoreL = new Label("Score: " + score, skin);
+        scoreL.setPosition(scl,scl);
+
+
+        stage.addActor(scoreL);
+
         player = new Player(game.col / 2 * scl, game.row / 2 * scl);
         random();
         if (r1 != game.col / 2 * scl && r2 != game.row / 2 * scl) fruit = new Fruit(r1, r2);
-        else random();
+        else {
+            random();
+            fruit = new Fruit(r1, r2);
+        }
 
         state = true;
         Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
@@ -74,6 +95,8 @@ public class ClassicSnake implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0.169f, 0.176f, 0.259f, 1); //bgColor
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        scoreL.setText("Score: "+score);
+        stage.draw();
         if (state) {
             checkInput();
             //rysowanie
@@ -104,9 +127,6 @@ public class ClassicSnake implements Screen {
             game.shape.end();
         }
 
-        game.batch.begin();
-        game.font.draw(game.batch, "Score: " + score, 20, 30);
-        game.batch.end();
         debug();
 
     }
@@ -132,7 +152,8 @@ public class ClassicSnake implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
+        skin.dispose();
     }
 
     public void random() {
@@ -156,6 +177,10 @@ public class ClassicSnake implements Screen {
 
     }
 
+    public static void changeState(boolean set) {
+        state = set;
+    }
+
     void eat() {
         if (fruit.fruitX == player.playerX && fruit.fruitY == player.playerY) {
             random();
@@ -176,5 +201,6 @@ public class ClassicSnake implements Screen {
     void debug() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.O)) player.addLength();
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) speed++;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) pause();
     }
 }

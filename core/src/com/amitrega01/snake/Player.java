@@ -1,10 +1,12 @@
 package com.amitrega01.snake;
 
+import com.amitrega01.snake.Screens.ClassicSnake;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import static com.amitrega01.snake.MyGame.HEIGHT;
 import static com.amitrega01.snake.MyGame.WIDTH;
+import static com.amitrega01.snake.MyGame.borders;
 import static com.amitrega01.snake.MyGame.scl;
 
 /**
@@ -69,12 +71,12 @@ public class Player {
                 playerX -= scl;
                 break;
         }
-
+        if (!borders) {
             if (playerX < 0) playerX = WIDTH - scl;
             if (playerX > WIDTH - scl) playerX = 0;
             if (playerY < 0) playerY = HEIGHT - scl;
             if (playerY > HEIGHT - scl) playerY = 0;
-
+        }
 
     }
     public void draw(ShapeRenderer shape) {
@@ -98,7 +100,15 @@ public class Player {
         for (int i=0;i<length;i++) {
             if (tailX[i] == playerX && tailY[i] == playerY)  return false;
         }
+        if (borders) {
+            if (playerX < 0) return false;
+            if (playerX > WIDTH) return false;
+            if (playerY < 0)  return false;
+            if (playerY > HEIGHT)return false;
+        }
         return true;
+
+
     }
 
 }
