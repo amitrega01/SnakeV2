@@ -23,7 +23,8 @@ public class MyGame extends Game {
     public static int fps = 8;
 
     public static float speed = 8;
-    public  int col, row;
+    public static int col;
+    public static int row;
 
     public static boolean borders = false;
 
