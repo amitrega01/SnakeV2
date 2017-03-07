@@ -26,8 +26,8 @@ public class Player {
         this.playerX = x;
         this.playerY = y;
         length = 0;
-        tailY = new int[100];
-        tailX = new int[100];
+        tailY = new int[MyGame.col*MyGame.row];
+        tailX = new int[MyGame.col*MyGame.row];
 
 
     }
@@ -101,10 +101,10 @@ public class Player {
             if (tailX[i] == playerX && tailY[i] == playerY)  return false;
         }
         if (borders) {
-            if (playerX < 0) return false;
-            if (playerX > WIDTH) return false;
-            if (playerY < 0)  return false;
-            if (playerY > HEIGHT)return false;
+            if (playerX <= 0) return false;
+            if (playerX >= WIDTH-scl) return false;
+            if (playerY <= 0)  return false;
+            if (playerY >= HEIGHT-scl)return false;
         }
         return true;
 
