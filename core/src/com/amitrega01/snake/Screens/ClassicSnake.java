@@ -15,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import static com.amitrega01.snake.MyGame.HEIGHT;
+import static com.amitrega01.snake.MyGame.WIDTH;
+import static com.amitrega01.snake.MyGame.borders;
 import static com.amitrega01.snake.MyGame.scl;
 import static com.amitrega01.snake.MyGame.speed;
 import static com.badlogic.gdx.math.MathUtils.random;
@@ -44,7 +47,7 @@ public class ClassicSnake implements Screen {
         stage = new Stage();
 
         scoreL = new Label("Score: " + score, skin);
-        scoreL.setPosition(scl,scl);
+        scoreL.setPosition(scl + 5, scl + 5);
 
 
         stage.addActor(scoreL);
@@ -95,13 +98,23 @@ public class ClassicSnake implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0.169f, 0.176f, 0.259f, 1); //bgColor
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        scoreL.setText("Score: "+score);
+        scoreL.setText("Score: " + score);
         stage.draw();
         if (state) {
+
             checkInput();
             //rysowanie
-
+            if (borders) {
+                game.shape.begin(ShapeRenderer.ShapeType.Filled);
+                game.shape.setColor(1, 1, 1, 1);
+                game.shape.rect(0, 0, WIDTH, scl);
+                game.shape.rect(0, 0, scl, HEIGHT);
+                game.shape.rect(WIDTH - scl, 0, scl, HEIGHT);
+                game.shape.rect(0, HEIGHT - scl, WIDTH, scl);
+                game.shape.end();
+            }
             game.shape.begin(ShapeRenderer.ShapeType.Filled);
+
             player.draw(game.shape);
             fruit.draw(game.shape);
             game.shape.end();
@@ -115,6 +128,7 @@ public class ClassicSnake implements Screen {
             }
             while (timeSpent >= 1 / speed) {
 
+
                 player.move();
                 timeSpent -= 1 / speed;
                 eat();
@@ -125,6 +139,15 @@ public class ClassicSnake implements Screen {
             player.draw(game.shape);
             fruit.draw(game.shape);
             game.shape.end();
+            if (borders) {
+                game.shape.begin(ShapeRenderer.ShapeType.Filled);
+                game.shape.setColor(1, 1, 1, 1);
+                game.shape.rect(0, 0, WIDTH, scl);
+                game.shape.rect(0, 0, scl, HEIGHT);
+                game.shape.rect(WIDTH - scl, 0, scl, HEIGHT);
+                game.shape.rect(0, HEIGHT - scl, WIDTH, scl);
+                game.shape.end();
+            }
         }
 
         debug();
@@ -157,23 +180,31 @@ public class ClassicSnake implements Screen {
     }
 
     public void random() {
-        r1 = random.nextInt(game.col - 1) * scl;
-        r2 = random.nextInt(game.row - 1) * scl;
+        if (borders) {
+            r1 = (random.nextInt(game.col - 2) * scl) + scl;
+            r2 = (random.nextInt(game.row - 2) * scl) + scl;
+        } else {
+            r1 = random.nextInt(game.col) * scl;
+            r2 = random.nextInt(game.row) * scl;
+        }
     }
 
     public void checkInput() {
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            if (player.dir != 3) {
-                while (player.playerY % scl!=0) player.move();
-                player.setDir(4);
-            }
+            if (player.dir != 3) player.setDir(4);
+
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
             if (player.dir != 4) player.setDir(3);
+
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
             if (player.dir != 2) player.setDir(1);
+
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
             if (player.dir != 1) player.setDir(2);
+
         }
+
 
     }
 
@@ -189,7 +220,7 @@ public class ClassicSnake implements Screen {
             }
             fruit.fruitX = r1;
             fruit.fruitY = r2;
-            score += 10;
+            score += 11;
             player.addLength();
             System.out.println(player.length);
             return;
@@ -199,7 +230,7 @@ public class ClassicSnake implements Screen {
 
 
     void debug() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.O)) player.addLength();
+        if (Gdx.input.isKeyPressed(Input.Keys.O)) player.addLength();
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) speed++;
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) pause();
     }
