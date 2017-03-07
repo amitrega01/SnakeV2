@@ -4,17 +4,23 @@ import com.amitrega01.snake.MyGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import static com.amitrega01.snake.MyGame.HEIGHT;
 import static com.amitrega01.snake.MyGame.WIDTH;
 import static com.amitrega01.snake.MyGame.borders;
 import static com.amitrega01.snake.MyGame.scl;
+import static com.amitrega01.snake.MyGame.speed;
 
 /**
  * Created by amitr on 04.03.2017.
@@ -34,11 +40,9 @@ public class OptionsScreen implements Screen {
         final Label bordersL = new Label("Borders", skin);
         bordersL.setPosition(3 * scl, MyGame.HEIGHT / 2 + 5 * scl);
 
-        final Label speedL = new Label("Speed", skin);
+        final Label speedL = new Label("Speed: " + speed, skin);
         speedL.setPosition(3 * scl, MyGame.HEIGHT / 2 + scl);
 
-        final Label sizeL = new Label("Size", skin);
-        sizeL.setPosition(3 * scl, MyGame.HEIGHT / 2 - 3 * scl);
 
         int btnW = 6 * scl;
         int btnH = 2 * scl;
@@ -52,7 +56,12 @@ public class OptionsScreen implements Screen {
         final TextButton backBtn = new TextButton("Back", skin);
         backBtn.setWidth(btnW);
         backBtn.setHeight(btnH);
-        backBtn.setPosition(WIDTH/2 - btnW/2,scl*3);
+        backBtn.setPosition(WIDTH / 2 - 2 * btnW / 2, scl * 3);
+
+        final TextButton startBtn = new TextButton("Start", skin);
+        startBtn.setWidth(btnW);
+        startBtn.setHeight(btnH);
+        startBtn.setPosition(WIDTH / 2, scl * 3);
 
 
         bordersBtn.addListener(new ClickListener() {
@@ -71,21 +80,41 @@ public class OptionsScreen implements Screen {
         );
 
         backBtn.addListener(new ClickListener() {
-                                   @Override
-                                   public void clicked(InputEvent event, float x, float y) {
-                                       game.setScreen(new MenuScreen(game));
-                                   }
-                               }
+                                @Override
+                                public void clicked(InputEvent event, float x, float y) {
+                                    game.setScreen(new MenuScreen(game));
+                                }
+                            }
+        );
+        startBtn.addListener(new ClickListener() {
+                                 @Override
+                                 public void clicked(InputEvent event, float x, float y) {
+                                     game.setScreen(new ClassicSnake(game));
+                                 }
+                             }
         );
 
+        final Slider speedS = new Slider(3, 15, 1, false, skin);
+        speedS.setWidth(8 * scl);
+        speedS.setHeight(scl);
+        speedS.setPosition(WIDTH - 8.5f * scl, MyGame.HEIGHT / 2 + scl);
+        speedS.setValue(speed);
 
+        speedS.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                speed = speedS.getValue();
+                speedL.setText("Speed: " + speed);
+            }
+        });
 
         stage.addActor(bordersL);
         stage.addActor(speedL);
-        stage.addActor(sizeL);
 
         stage.addActor(bordersBtn);
+        stage.addActor(speedS);
         stage.addActor(backBtn);
+        stage.addActor(startBtn);
         Gdx.input.setInputProcessor(stage);
 
     }
