@@ -12,10 +12,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
@@ -58,9 +60,11 @@ public class ClassicSnake implements Screen {
         scoreL.setPosition(scl + 5, scl + 5);
 
         pauseBtn = new ImageButton(cba);
-        pauseBtn.setScale(0.2f);
+       pauseBtn.setWidth(1.5f*scl);
+
+        pauseBtn.setHeight(1.5f*scl);
         pauseBtn.setColor(1, 1, 1, .5f);
-        pauseBtn.setPosition(WIDTH - 4 * scl, HEIGHT - 3 * scl);
+        pauseBtn.setPosition(WIDTH - 2* scl, HEIGHT - 2* scl);
         stage.addActor(pauseBtn);
         stage.addActor(scoreL);
 
@@ -100,6 +104,7 @@ public class ClassicSnake implements Screen {
 
             }
         }));
+        Gdx.input.setCatchBackKey(true);
     }
 
     @Override
@@ -115,40 +120,31 @@ public class ClassicSnake implements Screen {
         scoreL.setText("Score: " + score);
         stage.draw();
         if (state) {
-            if (pause) {
+            if (pause) { //menu pauzy
                 Gdx.gl.glEnable(GL20.GL_BLEND);
-                Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA);
-                if (borders) {
+                Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                if (borders) drawBorders();
 
-                    game.shape.begin(ShapeRenderer.ShapeType.Filled);
-                    game.shape.setColor(1, 1, 1, 1);
-                    game.shape.rect(0, 0, WIDTH, scl);
-                    game.shape.rect(0, 0, scl, HEIGHT);
-                    game.shape.rect(WIDTH - scl, 0, scl, HEIGHT);
-                    game.shape.rect(0, HEIGHT - scl, WIDTH, scl);
-                    game.shape.end();
-                }
                 game.shape.begin(ShapeRenderer.ShapeType.Filled);
 
                 player.draw(game.shape);
                 fruit.draw(game.shape);
                 game.shape.setColor(0, 0, 0, .5f);
-                game.shape.rect(0, 0,WIDTH,HEIGHT);
+                game.shape.rect(0, 0, WIDTH+scl, HEIGHT+scl);
 
                 game.shape.end();
 
                 Gdx.gl.glDisable(GL20.GL_BLEND);
+                if (Gdx.input.justTouched() ||Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
+
+                    pause = !pause;
+                }
+
             } else {
                 checkInput();
                 //rysowanie
                 if (borders) {
-                    game.shape.begin(ShapeRenderer.ShapeType.Filled);
-                    game.shape.setColor(1, 1, 1, 1);
-                    game.shape.rect(0, 0, WIDTH, scl);
-                    game.shape.rect(0, 0, scl, HEIGHT);
-                    game.shape.rect(WIDTH - scl, 0, scl, HEIGHT);
-                    game.shape.rect(0, HEIGHT - scl, WIDTH, scl);
-                    game.shape.end();
+                    drawBorders();
                 }
                 game.shape.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -177,15 +173,9 @@ public class ClassicSnake implements Screen {
             player.draw(game.shape);
             fruit.draw(game.shape);
             game.shape.end();
-            if (borders) {
-                game.shape.begin(ShapeRenderer.ShapeType.Filled);
-                game.shape.setColor(1, 1, 1, 1);
-                game.shape.rect(0, 0, WIDTH, scl);
-                game.shape.rect(0, 0, scl, HEIGHT);
-                game.shape.rect(WIDTH - scl, 0, scl, HEIGHT);
-                game.shape.rect(0, HEIGHT - scl, WIDTH, scl);
-                game.shape.end();
-            }
+            if (borders)
+               drawBorders();
+
         }
 
         debug();
@@ -243,6 +233,17 @@ public class ClassicSnake implements Screen {
 
         }
 
+        if (Gdx.input.justTouched()) {
+            int x = Gdx.input.getX();
+            int y = HEIGHT - Gdx.input.getY();
+            if (x > pauseBtn.getX() && y > pauseBtn.getY() && x < pauseBtn.getX() + pauseBtn.getWidth() && y < pauseBtn.getY() + pauseBtn.getHeight()) {
+                pause = !pause;
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
+            game.setScreen(new MenuScreen(game));
+        }
     }
 
     public static void changeState(boolean set) {
@@ -265,7 +266,15 @@ public class ClassicSnake implements Screen {
 
     }
 
-
+    void drawBorders() {
+        game.shape.begin(ShapeRenderer.ShapeType.Filled);
+        game.shape.setColor(1, 1, 1, 1);
+        game.shape.rect(0, 0, WIDTH, 3);
+        game.shape.rect(0, 0, 3, HEIGHT);
+        game.shape.rect(WIDTH - 3, 0, 3, HEIGHT);
+        game.shape.rect(0, HEIGHT - 3, WIDTH, 3);
+        game.shape.end();
+    }
     void debug() {
         if (Gdx.input.isKeyPressed(Input.Keys.O)) player.addLength();
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) speed++;

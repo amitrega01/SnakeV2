@@ -101,10 +101,10 @@ public class Player {
             if (tailX[i] == playerX && tailY[i] == playerY)  return false;
         }
         if (borders) {
-            if (playerX <= 0) return false;
-            if (playerX >= WIDTH-scl) return false;
-            if (playerY <= 0)  return false;
-            if (playerY >= HEIGHT-scl)return false;
+            if (playerX < 0) return false;
+            if (playerX > WIDTH-scl) return false;
+            if (playerY < 0)  return false;
+            if (playerY > HEIGHT-scl)return false;
         }
         return true;
 
