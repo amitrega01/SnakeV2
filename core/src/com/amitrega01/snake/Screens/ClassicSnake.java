@@ -9,11 +9,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import static com.amitrega01.snake.MyGame.HEIGHT;
 import static com.amitrega01.snake.MyGame.WIDTH;
@@ -32,24 +36,32 @@ public class ClassicSnake implements Screen {
     private Stage stage;
     private Skin skin;
 
+    private Texture icon;
+
     public Player player;
     public Fruit fruit;
-    static boolean state;
+    static boolean state, pause;
     float timeSpent;
     int score = 0;
     int r1, r2;
     final Label scoreL;
+    final ImageButton pauseBtn;
 
     public ClassicSnake(MyGame game) {
         this.game = game;
-
+        icon = new Texture("dotIcon.png");
         skin = new Skin(Gdx.files.internal("quantum-horizon/skin/quantum-horizon-ui.json"));
         stage = new Stage();
-
+        final TextureRegion abc = new TextureRegion(icon);
+        final TextureRegionDrawable cba = new TextureRegionDrawable(abc);
         scoreL = new Label("Score: " + score, skin);
         scoreL.setPosition(scl + 5, scl + 5);
 
-
+        pauseBtn = new ImageButton(cba);
+        pauseBtn.setScale(0.2f);
+        pauseBtn.setColor(1, 1, 1, .5f);
+        pauseBtn.setPosition(WIDTH - 4 * scl, HEIGHT - 3 * scl);
+        stage.addActor(pauseBtn);
         stage.addActor(scoreL);
 
         player = new Player(game.col / 2 * scl, game.row / 2 * scl);
@@ -61,6 +73,7 @@ public class ClassicSnake implements Screen {
         }
 
         state = true;
+        pause = false;
         Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
             @Override
             public void onUp() {
@@ -97,42 +110,67 @@ public class ClassicSnake implements Screen {
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.169f, 0.176f, 0.259f, 1); //bgColor
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
         scoreL.setText("Score: " + score);
         stage.draw();
         if (state) {
+            if (pause) {
+                Gdx.gl.glEnable(GL20.GL_BLEND);
+                Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA,GL20.GL_ONE_MINUS_SRC_ALPHA);
+                if (borders) {
 
-            checkInput();
-            //rysowanie
-            if (borders) {
+                    game.shape.begin(ShapeRenderer.ShapeType.Filled);
+                    game.shape.setColor(1, 1, 1, 1);
+                    game.shape.rect(0, 0, WIDTH, scl);
+                    game.shape.rect(0, 0, scl, HEIGHT);
+                    game.shape.rect(WIDTH - scl, 0, scl, HEIGHT);
+                    game.shape.rect(0, HEIGHT - scl, WIDTH, scl);
+                    game.shape.end();
+                }
                 game.shape.begin(ShapeRenderer.ShapeType.Filled);
-                game.shape.setColor(1, 1, 1, 1);
-                game.shape.rect(0, 0, WIDTH, scl);
-                game.shape.rect(0, 0, scl, HEIGHT);
-                game.shape.rect(WIDTH - scl, 0, scl, HEIGHT);
-                game.shape.rect(0, HEIGHT - scl, WIDTH, scl);
+
+                player.draw(game.shape);
+                fruit.draw(game.shape);
+                game.shape.setColor(0, 0, 0, .5f);
+                game.shape.rect(0, 0,WIDTH,HEIGHT);
+
                 game.shape.end();
-            }
-            game.shape.begin(ShapeRenderer.ShapeType.Filled);
 
-            player.draw(game.shape);
-            fruit.draw(game.shape);
-            game.shape.end();
+                Gdx.gl.glDisable(GL20.GL_BLEND);
+            } else {
+                checkInput();
+                //rysowanie
+                if (borders) {
+                    game.shape.begin(ShapeRenderer.ShapeType.Filled);
+                    game.shape.setColor(1, 1, 1, 1);
+                    game.shape.rect(0, 0, WIDTH, scl);
+                    game.shape.rect(0, 0, scl, HEIGHT);
+                    game.shape.rect(WIDTH - scl, 0, scl, HEIGHT);
+                    game.shape.rect(0, HEIGHT - scl, WIDTH, scl);
+                    game.shape.end();
+                }
+                game.shape.begin(ShapeRenderer.ShapeType.Filled);
 
-            timeSpent += Gdx.graphics.getDeltaTime();
-            if (timeSpent > 1) {
-                //The following loop will try to catch up if you're not at 30 fps.
-                //This code will reset the amount of time it needs to spend catching up if there's too
-                //much to do (maybe because the device can't keep up).
-                timeSpent = 1 / speed;
-            }
-            while (timeSpent >= 1 / speed) {
+                player.draw(game.shape);
+                fruit.draw(game.shape);
+                game.shape.end();
+
+                timeSpent += Gdx.graphics.getDeltaTime();
+                if (timeSpent > 1) {
+                    //The following loop will try to catch up if you're not at 30 fps.
+                    //This code will reset the amount of time it needs to spend catching up if there's too
+                    //much to do (maybe because the device can't keep up).
+                    timeSpent = 1 / speed;
+                }
+                while (timeSpent >= 1 / speed) {
 
 
-                player.move();
-                timeSpent -= 1 / speed;
-                eat();
-                state = player.checkCollision();
+                    player.move();
+                    timeSpent -= 1 / speed;
+                    eat();
+                    state = player.checkCollision();
+                }
             }
         } else {
             game.shape.begin(ShapeRenderer.ShapeType.Line);
@@ -205,7 +243,6 @@ public class ClassicSnake implements Screen {
 
         }
 
-
     }
 
     public static void changeState(boolean set) {
@@ -232,6 +269,6 @@ public class ClassicSnake implements Screen {
     void debug() {
         if (Gdx.input.isKeyPressed(Input.Keys.O)) player.addLength();
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) speed++;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) pause();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) pause = !pause;
     }
 }
